@@ -1,9 +1,31 @@
 #include <Adafruit_NeoPixel.h>
 
+
 //**********************************************
-//* SPI                                        * 
+//* CONSTANTS / SETTINGS                       *
 //**********************************************
+
+// SPI Pin
 #define PIN 6
+
+// Change to 1 to toggle debug mode
+#define DEBUG 1
+
+// Brightness 
+#define MAX_BRIGHTNESS 255 // No higher than 255
+#define MIN_BRIGHTNESS -1   // No lower than 0
+
+// Fade In
+#define FADE_IN_STEP  3
+#define FADE_IN_SPEED 50
+
+// Fade Out
+#define FADE_OUT_STEP  3
+#define FADE_OUT_SPEED 40
+
+// Stalls
+#define INTERMISSION 400
+#define CURTAIN_DOWN 2000
 
 
 //**********************************************
@@ -30,16 +52,16 @@ Adafruit_NeoPixel strip = Adafruit_NeoPixel(ROWS, PIN, NEO_GRB + NEO_KHZ800);
 //* COLORS                                     *
 //**********************************************
                               // R    G    B
-const int COLOR_W = strip.Color( 255, 255, 255 );
-const int COLOR_K = strip.Color(   0,   0,   0 );
+const int COLOR_W = strip.Color( 255, 255, 255 ); // White
+const int COLOR_K = strip.Color(   0,   0,   0 ); // Black (off)
 
-const int COLOR_R = strip.Color( 255,   0,   0 );
-const int COLOR_O = strip.Color( 255, 166,   0 );
-const int COLOR_Y = strip.Color( 255, 255, 100 );
-const int COLOR_G = strip.Color(   0, 255,   0 );
-const int COLOR_B = strip.Color(   0,   0, 255 );
-const int COLOR_I = strip.Color( 155,   0, 255 );
-const int COLOR_V = strip.Color( 255,   0, 255 );
+const int COLOR_R = strip.Color( 255,   0,   0 ); // Red
+const int COLOR_O = strip.Color( 255, 166,   0 ); // Orange
+const int COLOR_Y = strip.Color( 255, 255, 100 ); // Yellow
+const int COLOR_G = strip.Color(   0, 255,   0 ); // Green
+const int COLOR_B = strip.Color(   0,   0, 255 ); // Blue
+const int COLOR_I = strip.Color( 155,   0, 255 ); // Indigo
+const int COLOR_V = strip.Color( 255,   0, 255 ); // Violet
 
 
 //**********************************************
@@ -63,33 +85,6 @@ int col_names[COLS] = {
   mother,
   passed
 };
-
-
-//**********************************************
-//* VARIBLES                                   *
-//**********************************************
-
-// Brightness 
-#define MAX_BRIGHTNESS 255 // No higher than 255
-#define MIN_BRIGHTNESS -1   // No lower than 0
-
-// Fade In
-#define FADE_IN_STEP  3
-#define FADE_IN_SPEED 50
-
-// Fade Out
-#define FADE_OUT_STEP  3
-#define FADE_OUT_SPEED 40
-
-// Stalls
-#define INTERMISSION 400
-#define CURTAIN_DOWN 2000
-
-// Iterators - Do not change
-int color;
-int i;
-int ii;
-int brightness;
 
 
 //**********************************************
@@ -167,8 +162,23 @@ bool dataset[ROWS][COLS] = {
 
 
 //**********************************************
+//* PROGRAM VARIBLES                           *
+//**********************************************
+// Do Not Change
+int color;
+int i;
+int ii;
+int brightness;
+
+
+//**********************************************
 //* FUNCTIONS                                  *
 //**********************************************
+
+void debug(char *message) {
+  if(DEBUG == 1)
+    Serial.println(message);
+}
 
 void fadeIn() {
   for(
@@ -191,11 +201,13 @@ void fadeIn() {
 
     strip.setBrightness(brightness);
 
-    char message[20];
+    if(DEBUG == 1) { 
+      char message[20];
 
-    sprintf(message, "b - %d", brightness);
+      sprintf(message, "b - %d", brightness);
 
-    Serial.println(message);
+      debug(message);
+    }
 
     strip.show();
 
@@ -224,11 +236,13 @@ void fadeOut() {
 
     strip.setBrightness(brightness);
 
-    char message[20];
+    if(DEBUG == 1) {
+      char message[20];
 
-    sprintf(message, "b - %d", brightness);
+      sprintf(message, "b - %d", brightness);
 
-    Serial.println(message);
+      debug(message);
+    }
 
     strip.show();
 
@@ -245,9 +259,11 @@ void setup() {
   strip.begin();
   strip.show(); 
 
-  Serial.begin(9600);
+  if(DEBUG == 1) {
+    Serial.begin(9600);
 
-  while(! Serial) { ; }
+    while(! Serial) { ; }
+  }
 }
 
 
@@ -259,13 +275,13 @@ void loop() {
   for(i = 0; i < COLS; i++) {
     fadeIn();
 
-    Serial.println("INTERMISSION");
+    debug("INTERMISSION");
 
     delay(INTERMISSION);
 
     fadeOut();
 
-    Serial.println("CURTAIN DOWN");
+    debug("CURTAIN DOWN");
     
     delay(CURTAIN_DOWN);
   }
