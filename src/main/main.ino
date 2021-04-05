@@ -12,8 +12,8 @@
 #define DEBUG 1
 
 // Brightness 
-#define MAX_BRIGHTNESS 255 // No higher than 255
-#define MIN_BRIGHTNESS -1   // No lower than 0
+#define MAX_BRIGHTNESS 255 // No higher than 255 (completely on)
+#define MIN_BRIGHTNESS -1  // No lower  than -1  (completely off)
 
 // Fade In
 #define FADE_IN_STEP  3
@@ -69,7 +69,11 @@ const int COLOR_V = strip.Color( 255,   0, 255 ); // Violet
 //**********************************************
 
 // Assign a color to a datapoint
+
+// Default color
 const int na      = COLOR_Y;
+
+// Datapoint colors
 const int race    = COLOR_R;
 const int over_50 = COLOR_O;
 const int teens   = COLOR_G;
