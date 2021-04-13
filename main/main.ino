@@ -56,6 +56,9 @@ const int COLS = 4;
 //* NEO Pixel Init                             *
 //**********************************************
 
+// CHECK HERE if the program and light strip are
+// not communicating properly. The third 
+// argument here is protocol config
 Adafruit_NeoPixel strip = Adafruit_NeoPixel(ROWS, PIN, NEO_GRB + NEO_KHZ800);
 
 
@@ -80,7 +83,11 @@ const int COLOR_V = strip.Color( 255,   0, 255 ); // Violet
 //**********************************************
 
 // Assign a color to a datapoint
+
+// The default color
 const int na      = COLOR_Y;
+
+// Datapoint colors
 const int race    = COLOR_R;
 const int over_50 = COLOR_O;
 const int phil    = COLOR_B;

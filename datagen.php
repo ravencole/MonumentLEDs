@@ -3,43 +3,49 @@
 // total dataset * 
 // % of total dataset represented in datapoint
 $datapoints = [
-  100, 62, 54, 160
+  100, // POC
+  62,  // Over 60
+  54,  // From Philly
+  160  // Mothers and Grandmothers
 ];
 
 // folks in dataset
 $rows = 200;
+// # of datapoints
 $cols = count($datapoints);
 
 $datasets = [];
 
-for($i = 0; $i < $rows; $i++) {
+for($i = 0; $i < $rows; $i++) 
   array_push($datasets, []);
-}
 
 foreach($datapoints as $stat) {
-  for($i = 0; $i < $rows; $i++) {
+  for($i = 0; $i < $rows; $i++) 
     $datasets[$i][] = $i < $stat;
-  }
 
   shuffle($datasets);
+}
+
+function prepareLine($line) {
+  return "\t" . str_replace(
+    [ '[', ']' ],
+    [ '{', '}' ],
+    json_encode($line)
+  );
 }
 
 $export = "extern bool dataset[{$rows}][$cols] = {\n";
  
 for($i = 0; $i < $rows - 1; $i++) {
-  $export .= "\t" . str_replace([ '[', ']' ],[ '{', '}' ],json_encode($datasets[$i]));
+  $last_line = $i === $rows - 2;
 
-  if($i !== $rows - 2)
-    $export .= ",\n";
-  else 
-    $export .= "\n";
-}
-foreach($datasets as $person) {
+  $export .= prepareLine($datasets[$i])
+    . ($last_line ? "\n" : ",\n");
 }
 
-$export .= "};";
+$export .= "};\n";
 
-file_put_contents("./src/main/dataset.h", $export);
+file_put_contents("./main/dataset.h", $export);
 
 echo "Done.\n";
 
