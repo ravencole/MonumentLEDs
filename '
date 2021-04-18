@@ -22,25 +22,21 @@
 
 // Brightness 
 #define MAX_BRIGHTNESS 255 // No higher than 255
-#define MIN_BRIGHTNESS -1  // No lower than 0
+#define MIN_BRIGHTNESS 0   // No lower than 0
 
 // Fade In
 #define FADE_IN_STEP  3
 #define FADE_IN_SPEED 50
+#define INTRO_FADE_IN_STEP  3
+#define INTRO_FADE_IN_SPEED 50
+#define OUTRO_FADE_IN_STEP  3
+#define OUTRO_FADE_IN_SPEED 50
 
 // Fade Out
 #define FADE_OUT_STEP  3
 #define FADE_OUT_SPEED 40
-
-// Intro fades
-#define INTRO_FADE_IN_STEP   3
-#define INTRO_FADE_IN_SPEED  50
 #define INTRO_FADE_OUT_STEP  3
 #define INTRO_FADE_OUT_SPEED 40
-
-// Outro fades
-#define OUTRO_FADE_IN_STEP   3
-#define OUTRO_FADE_IN_SPEED  50
 #define OUTRO_FADE_OUT_STEP  3
 #define OUTRO_FADE_OUT_SPEED 40
 
@@ -54,11 +50,7 @@
 #define OUTRO_INTERMISSION 400
 #define OUTRO_CURTAIN_DOWN 2000
 
-#define INTRO_PULSES         10
-#define OUTRO_PULSES         2
 #define PULSES_PER_DATAPOINT 5
-
-#define ENDING_DELAY 10000
 
 // Don't change
 #define COLUMN_RACE   0
@@ -74,7 +66,7 @@
 // Amount of people
 // * Change this to add more people to the data
 // * This must be changed in the datagen.php file as well
-const int ROWS = 60; 
+const int ROWS = 10; 
 
 // Amount of data categories
 // * Change this to add datapoints
@@ -118,7 +110,6 @@ const int COLOR_V = strip.Color( 255,   0, 255 ); // Violet
 const int COLOR_DEFAULT = COLOR_Y;
 
 // Datapoint colors
-/* const int COLOR_RACE    = COLOR_R; */
 const int COLOR_RACE    = COLOR_R;
 const int COLOR_ELDER   = COLOR_O;
 const int COLOR_PHILLY  = COLOR_B;
@@ -129,9 +120,9 @@ const int COLOR_MOTHER  = COLOR_I;
 //* PROGRAM VARIBLES                           *
 //**********************************************
 // Do Not Change
+int color;
 int i;
 int ii;
-int color;
 int brightness;
 
 
@@ -144,106 +135,114 @@ void debug(char *message) {
     Serial.println(message);
 }
 
-void fadeIn(
-  int *dataset, 
-  int fade_in_step  = FADE_IN_STEP, 
-  int fade_in_speed = FADE_IN_SPEED
-) {
+void intro() {
   for(
     brightness =  MIN_BRIGHTNESS; 
     brightness <  MAX_BRIGHTNESS; 
-    brightness += fade_in_step
+    brightness += INTRO_FADE_IN_STEP
   ) {
-
-    if(brightness > MAX_BRIGHTNESS)
-      brightness = MAX_BRIGHTNESS;
+    strip.setBrightness(brightness);
 
     for(int i = 0; i < ROWS; i++) 
-      strip.setPixelColor(i, dataset[i]);
-
-    strip.setBrightness(brightness);
+      strip.setPixelColor(i, COLOR_DEFAULT);
 
     strip.show();
 
-    delay(fade_in_speed);
+    delay(INTRO_FADE_IN_SPEED);
   }
-}
 
-void fadeOut(
-  int *dataset,
-  int fade_out_step  = FADE_OUT_STEP,
-  int fade_out_speed = FADE_OUT_SPEED
-) {
+  delay(INTRO_INTERMISSION);
+
   for(
     brightness =  MAX_BRIGHTNESS; 
     brightness >  MIN_BRIGHTNESS; 
-    brightness -= fade_out_step
+    brightness -= OUTRO_FADE_OUT_STEP
   ) {
-    if(brightness < MIN_BRIGHTNESS)
-      brightness = MIN_BRIGHTNESS;
+    strip.setBrightness(brightness);
+
+    for(int i = 0; i < ROWS; i++) 
+      strip.setPixelColor(i, COLOR_DEFAULT);
+
+    strip.show();
+
+    delay(INTRO_FADE_OUT_SPEED);
+  }
+
+  delay(INTRO_CURTAIN_DOWN);
+}
+
+void outro() {
+  for(
+    brightness =  MIN_BRIGHTNESS; 
+    brightness <  MAX_BRIGHTNESS; 
+    brightness += OUTRO_FADE_IN_STEP
+  ) {
+    strip.setBrightness(brightness);
+
+    for(int i = 0; i < ROWS; i++) 
+      strip.setPixelColor(i, COLOR_DEFAULT);
+
+    strip.show();
+
+    delay(OUTRO_FADE_IN_SPEED);
+  }
+
+  delay(OUTRO_INTERMISSION);
+
+  for(
+    brightness =  MIN_BRIGHTNESS; 
+    brightness <  MAX_BRIGHTNESS; 
+    brightness += OUTRO_FADE_OUT_STEP
+  ) {
+    strip.setBrightness(brightness);
+
+    for(int i = 0; i < ROWS; i++) 
+      strip.setPixelColor(i, COLOR_DEFAULT);
+
+    strip.show();
+
+    delay(OUTRO_FADE_OUT_SPEED);
+  }
+
+  delay(OUTRO_CURTAIN_DOWN);
+}
+
+void fadeIn(bool *dataset) {
+  for(
+    brightness =  MIN_BRIGHTNESS; 
+    brightness <  MAX_BRIGHTNESS; 
+    brightness += FADE_IN_STEP
+  ) {
+    strip.setBrightness(brightness);
 
     for(int i = 0; i < ROWS; i++) 
       strip.setPixelColor(i, dataset[i]);
 
+    strip.show();
+
+    delay(FADE_IN_SPEED);
+  }
+}
+
+void fadeOut(bool *dataset) {
+  for(
+    brightness =  MAX_BRIGHTNESS; 
+    brightness >  MIN_BRIGHTNESS; 
+    brightness -= FADE_OUT_STEP
+  ) {
     strip.setBrightness(brightness);
+
+    for(int i = 0; i < ROWS; i++) 
+      strip.setPixelColor(i, dataset[i]);
 
     strip.show();
 
-    delay(fade_out_speed);
+    delay(FADE_OUT_SPEED);
   }
 }
 
-void intro() {
-  int data[ROWS];
 
-  for(int i = 0; i < ROWS; i++) 
-    data[i] = COLOR_DEFAULT;
-
-  for(int i = 0; i < INTRO_PULSES; i++) {
-    fadeIn(
-      data, 
-      INTRO_FADE_IN_STEP, 
-      INTRO_FADE_IN_SPEED
-    );
-
-    delay(INTRO_INTERMISSION);
-
-    fadeOut(
-      data, 
-      INTRO_FADE_OUT_STEP, 
-      INTRO_FADE_OUT_SPEED
-    );
-
-    delay(INTRO_CURTAIN_DOWN);
-  }
-}
-
-void outro() {
-  int data[ROWS];
-
-  for(int i = 0; i < ROWS; i++) 
-    data[i] = COLOR_DEFAULT;
-
-  for(int i = 0; i < OUTRO_PULSES; i++) {
-    fadeIn(
-      data, 
-      OUTRO_FADE_IN_STEP, 
-      OUTRO_FADE_IN_SPEED
-    );
-
-    delay(OUTRO_INTERMISSION);
-
-    fadeOut(
-      data, 
-      OUTRO_FADE_OUT_STEP, 
-      OUTRO_FADE_OUT_SPEED
-    );
-
-    delay(OUTRO_CURTAIN_DOWN);
-  }
-}
-
-void pulse(int *dataset) {
+void pulse(bool *dataset) {
   for(int i = 0; i < PULSES_PER_DATAPOINT; i++) {
     fadeIn(dataset);
 
@@ -256,7 +255,7 @@ void pulse(int *dataset) {
 }
 
 void pulseColumn(int col_num = -1, int color = 0) {
-  int column[ROWS];
+  bool column[ROWS];
 
   for(int i = 0; i < ROWS; i++) {
     if(col_num == -1 || dataset[i][col_num] == false)
@@ -324,21 +323,19 @@ void setup() {
 void loop() {
   intro();
 
-  pulseRace();
+  /* pulseRace(); */
 
-  pulseDefault();
+  /* pulseDefault(); */
 
-  pulseElder();
+  /* pulseElder(); */
 
-  pulseDefault();
+  /* pulseDefault(); */
 
-  pulsePhilly();
+  /* pulsePhilly(); */
 
-  pulseDefault();
+  /* pulseDefault(); */
 
-  pulseMother();
+  /* pulseMother(); */
 
-  outro();
-
-  delay(ENDING_DELAY);
+  /* outro(); */
 }
