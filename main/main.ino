@@ -74,7 +74,7 @@
 // Amount of people
 // * Change this to add more people to the data
 // * This must be changed in the datagen.php file as well
-const int ROWS = 60; 
+const int ROWS = 200; 
 
 // Amount of data categories
 // * Change this to add datapoints
